@@ -23,11 +23,20 @@ if (isset($_GET['cmd'])) {
             $autoloader = Zend_Loader_Autoloader::getInstance();
             $autoloader->registerNamespace('Zend_');
 
-            $parameters = [
+            /*$parameters = [
                 'host'     => 'db.kolesa.dev',
                 'username' => 'akim',
                 'password' => 'CJfFGcbyZp23qd8E',
                 'dbname'   => 'ak_krisha',
+                'port'     => 3306,
+                'charset'  => 'utf8',
+            ];*/
+
+            $parameters = [
+                'host'     => '127.0.0.1',
+                'username' => 'root',
+                'password' => '1q2w3e4',
+                'dbname'   => 'test',
                 'port'     => 3306,
                 'charset'  => 'utf8',
             ];
@@ -63,7 +72,7 @@ $cache = new Zend_Cache_Backend_Memcached(
                 'port' => '11211'
             )
         ),
-        'compression' => true
+        'compression' => false
     ]);
 
 $logger = new Logger();
@@ -100,6 +109,8 @@ class Test
     public $testHost = null;
 
     public $cache = null;
+
+    protected $domObjectsLocalCache = [];
 
     function __construct($entities, $logger, $cache)
     {
@@ -197,17 +208,25 @@ class Test
 
     public function getDom($url)
     {
-        $key    = 'getDom.' . md5($url);
-        $result = $this->cache->load($key);
+        $key       = 'getDom.' . md5($url);
+
+        if (isset($this->domObjectsLocalCache[$key])) {
+            return $this->domObjectsLocalCache[$key];
+        }
+
+        $result    = $this->cache->load($key);
+        $cacheTime = 86400;
 
         if (strpos($url, $this->testHost) !== false) {
-            $result = false;
+            $result = false;;
         }
 
         if (false === $result) {
             $result = new Zend_Dom_Query(file_get_contents($url));
-            $this->cache->save($result, $key, 86400);
+            $this->cache->save($result, $key, [], $cacheTime);
         }
+
+        $this->domObjectsLocalCache[$key] = $result;
 
         return $result;
     }
