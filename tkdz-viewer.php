@@ -27,11 +27,14 @@
     <h2>Сравнение ТКДЗ продакшина с указанным урлом</h2><br/>
 
     <a href="http://c2n.me/inQ8v5.png">Help!!! </a><br/>
-    <a href="#" class="testing-set">Testing set</a><br/><br/>
-    <input type="button" value="check" class="do-check" /><br/><br/>
+    Testing sets:<a href="#" data-cmd="get-search-urls" class="command">search urls</a>
+    <a href="#" data-cmd="get-advert-urls" class="command">advert urls</a><br/><br/>
+
+    <input type="button" value="check" class="do-check" />
+    <input placeholder="Хост для сравнения" class="compare-host"> <br/><br/>
 
     <div class="url-block">
-        <a class="compare-with" style="font-size: 11px;margin-bottom: 5px;" href="#">Compare with...</a><br/>
+        <a class="compare-with" style="font-size: 11px;margin-bottom: 5px;" href="#">Compare with text</a><br/>
         <div class="compare-data">
             <textarea class="title" placeholder="Title"></textarea><br/>
             <textarea class="description" placeholder="Description"></textarea><br/>
@@ -56,14 +59,15 @@
             return false;
         });
 
-        $(".testing-set").click(function() {
+        $(".command").click(function() {
 
-            var urlBlock = $(".url-block").last();
-            var newUrlBlock = null;
+            var
+                urlBlock = $(".url-block").last(),
+                $this    = $(this);
 
             $.ajax({
                 url     : 'tkdz-viewer-ajax.php',
-                data    : {'cmd': 'get-testing-urls'},
+                data    : {'cmd': $this.data('cmd')},
                 dataType: 'json',
                 success : function (response) {
                     if (typeof (response['data']) != 'undefined') {
@@ -113,7 +117,7 @@
 
             $.ajax({
                 url    : 'tkdz-viewer-ajax.php',
-                data   : {'url' : input.val(), 'compare-data':compareData},
+                data   : {'url' : input.val(), 'compare-data':compareData, 'compare-host':$('.compare-host').val()},
                 dataType:'json',
                 success: function (response) {
                     if (typeof (response['data']) != 'undefined') {

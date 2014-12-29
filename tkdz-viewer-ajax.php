@@ -10,6 +10,20 @@ set_include_path(
 );
 
 require_once 'Zend/Loader/Autoloader.php';
+require_once 'Zend/Dom/Query.php';
+require_once 'Zend/Cache/Backend/Memcached.php';
+
+$autoloader = Zend_Loader_Autoloader::getInstance();
+$autoloader->registerNamespace('Zend_');
+
+$parameters = [
+    'host'     => '127.0.0.1',
+    'username' => 'root',
+    'password' => '1q2w3e4',
+    'dbname'   => 'test',
+    'port'     => 3306,
+    'charset'  => 'utf8',
+];
 
 $out = [
     'data'  => '',
@@ -17,42 +31,27 @@ $out = [
 ];
 
 if (isset($_GET['cmd'])) {
+    $db = Zend_Db::factory('Mysqli', $parameters);
+
     switch ($_GET['cmd']) {
-        case 'get-testing-urls':
-
-            $autoloader = Zend_Loader_Autoloader::getInstance();
-            $autoloader->registerNamespace('Zend_');
-
-            /*$parameters = [
-                'host'     => 'db.kolesa.dev',
-                'username' => 'akim',
-                'password' => 'CJfFGcbyZp23qd8E',
-                'dbname'   => 'ak_krisha',
-                'port'     => 3306,
-                'charset'  => 'utf8',
-            ];*/
-
-            $parameters = [
-                'host'     => '127.0.0.1',
-                'username' => 'root',
-                'password' => '1q2w3e4',
-                'dbname'   => 'test',
-                'port'     => 3306,
-                'charset'  => 'utf8',
-            ];
-
-            $db     = Zend_Db::factory('Mysqli', $parameters);
-            $result = $db->fetchAll('select * from `tests` order by id desc');
+        case 'get-search-urls':
+            $result = $db->fetchAll('select * from `search_urls` order by id desc');
 
             $out['data'] = $result;
             echo json_encode($out);
 
-            return;
+            break;
+        case 'get-advert-urls':
+            $result = $db->fetchAll('select * from `advert_urls` order by id desc');
+
+            $out['data'] = $result;
+            echo json_encode($out);
 
             break;
     }
-}
 
+    return;
+}
 
 if (!isset($_GET['url']) || !$_GET['url']) {
     $out['error'] = 'нужен урл';
@@ -60,9 +59,6 @@ if (!isset($_GET['url']) || !$_GET['url']) {
 
     return;
 }
-require_once 'Zend/Dom/Query.php';
-require_once 'Zend/Cache/Backend/Memcached.php';
-
 
 $cache = new Zend_Cache_Backend_Memcached(
     [
@@ -73,23 +69,38 @@ $cache = new Zend_Cache_Backend_Memcached(
             )
         ),
         'compression' => false
-    ]);
+    ]
+);
 
-$logger = new Logger();
-$tester = new Test([['url' => $_GET['url']]], $logger, $cache);
+try {
+    $logger = new Logger();
+    $tester = new Test([['url' => $_GET['url']]], $logger, $cache);
 
-if (isset($_GET['compare-data'])) {
-    $tester->compareData = $_GET['compare-data'];
+    if (isset($_GET['compare-data'])) {
+        $tester->compareData = $_GET['compare-data'];
+    }
+
+    if (isset($_GET['compare-host']) && $_GET['compare-host']) {
+        $tester->compareHost = $_GET['compare-host'];
+    }
+
+    $tester->doWork();
+
+    if ($tester->compareResult == 'identical') {
+        $out['data'] = $tester->compareWith . ': <div style="color:green">all-data-identical</div>';
+    } else {
+        $out['data'] = '<pre>' . $logger->data . '</pre>';
+    }
+
+    echo json_encode($out);
+
+} catch (Exception $e) {
+    $out['error'] = $e->getMessage();
+    echo json_encode($out);
 }
-$tester->doWork();
-if ($tester->compareResult == 'identical') {
-    $out['data'] = $tester->compareWith . ': <div style="color:green">all-data-identical</div>';
-} else {
-    $out['data'] = '<pre>' . $logger->data . '</pre>';
-}
-echo json_encode($out);
+
+
 return;
-
 
 class Test
 {
@@ -104,7 +115,7 @@ class Test
 
     public $compareWith = null;
 
-    public $prodHost = null;
+    public $compareHost = null;
 
     public $testHost = null;
 
@@ -112,7 +123,7 @@ class Test
 
     protected $domObjectsLocalCache = [];
 
-    function __construct($entities, $logger, $cache)
+    public function __construct($entities, $logger, $cache)
     {
 
         $this->logger = $logger;
@@ -134,27 +145,30 @@ class Test
                 $this->compareWith = 'compare with accepted data';
             } else {
                 if (strpos($url, 'krisha') !== false) {
-                    $prodUrl        = preg_replace('/http:\/\/[^\/]+/', 'http://krisha.kz', $url);
-                    $this->prodHost = 'krisha.kz';
+                    if (!$this->compareHost) {
+                        $this->compareHost = 'krisha.kz';
+                    }
+
+                    $compareUrl = preg_replace('/http:\/\/[^\/]+/', 'http://' . $this->compareHost, $url);
                     $this->testHost = 'krisha.ak.dev';
                 }
 
                 if (strpos($url, 'market') !== false) {
-                    $prodUrl = preg_replace('/http:\/\/[^\/]+/', 'http://market.kz', $url);
+                    $compareUrl = preg_replace('/http:\/\/[^\/]+/', 'http://market.kz', $url);
                 }
 
                 if (strpos($url, 'kolesa') !== false) {
-                    $prodUrl = preg_replace('/http:\/\/[^\/]+/', 'http://kolesa.kz', $url);
+                    $compareUrl = preg_replace('/http:\/\/[^\/]+/', 'http://kolesa.kz', $url);
                 }
 
-                $this->compareWith = 'compare with ' . $prodUrl;
-                $this->logger->log('compare with ' . $prodUrl);
+                $this->compareWith = 'compare with ' . $compareUrl;
+                $this->logger->log('compare with ' . $compareUrl);
                 $this->logger->log('');
-                $isIdentical = $this->compare($prodUrl, $url, 'title') && $isIdentical;
-                $isIdentical = $this->compare($prodUrl, $url, 'meta[name="description"]', 'content') && $isIdentical;
-                $isIdentical = $this->compare($prodUrl, $url, 'h1') && $isIdentical;
-                $isIdentical = $this->compare($prodUrl, $url, 'link[rel="canonical"]', 'href') && $isIdentical;
-                $isIdentical = $this->compare($prodUrl, $url, 'meta[name="robots"]', 'content') && $isIdentical;
+                $isIdentical = $this->compare($compareUrl, $url, 'title') && $isIdentical;
+                $isIdentical = $this->compare($compareUrl, $url, 'meta[name="description"]', 'content') && $isIdentical;
+                $isIdentical = $this->compare($compareUrl, $url, 'h1') && $isIdentical;
+                $isIdentical = $this->compare($compareUrl, $url, 'link[rel="canonical"]', 'href') && $isIdentical;
+                $isIdentical = $this->compare($compareUrl, $url, 'meta[name="robots"]', 'content') && $isIdentical;
             }
         }
 
@@ -208,7 +222,7 @@ class Test
 
     public function getDom($url)
     {
-        $key       = 'getDom.' . md5($url);
+        $key = 'getDom.' . md5($url);
 
         if (isset($this->domObjectsLocalCache[$key])) {
             return $this->domObjectsLocalCache[$key];
@@ -276,7 +290,7 @@ class Test
         if ($results && $results->current()) {
             $attrValue = $results->current()->getAttribute($attrName);
             if (0 === strcasecmp($attrName, 'href')) {
-                $attrValue = str_replace([$this->prodHost, $this->testHost], ['', ''], $attrValue);
+                $attrValue = str_replace([$this->compareHost, $this->testHost], ['', ''], $attrValue);
             }
 
             return $attrValue;
@@ -290,7 +304,7 @@ class Logger
 {
     public $data = '';
 
-    public function  log($data)
+    public function log($data)
     {
         $this->data .= "\n" . $data;
     }
