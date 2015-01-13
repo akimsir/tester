@@ -31,7 +31,7 @@
     <a href="#" data-cmd="get-advert-urls" class="command">advert urls</a><br/><br/>
 
     <input type="button" value="check" class="do-check" />
-    <input placeholder="Хост для сравнения" class="compare-host"> <br/><br/>
+    <input placeholder="Хост для сравнения" class="compare-host"> <small>по умолчанию krisha.kz</small> <br/><br/>
 
     <div class="url-block">
         <a class="compare-with" style="font-size: 11px;margin-bottom: 5px;" href="#">Compare with text</a><br/>
