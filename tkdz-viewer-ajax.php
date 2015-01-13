@@ -153,8 +153,17 @@ class Test
                     }
 
                     $compareUrl = preg_replace('/http:\/\/[^\/]+/', 'http://' . $this->compareHost, $url);
+                    preg_match('/http:\/\/([^\/]+)/', $url, $matches);
+                    if (isset($matches[1])) {
+                        $this->testHost = $matches[1];
+                    } else {
+                        $out = [
+                            'data'  => '',
+                            'error' => 'Не определён урл для сравнения'
+                        ];
 
-                    $this->testHost = 'krisha.ak.dev';
+                        return json_encode($out);
+                    }
                 }
 
                 if (strpos($url, 'market') !== false) {
@@ -310,5 +319,11 @@ class Logger
     public function log($data)
     {
         $this->data .= "\n" . $data;
+
+        file_put_contents(
+        'tkdz-viewer-log',
+        "\n".date('Y-m-d H:i:s').' ' .$data,
+        FILE_APPEND
+        );
     }
 }
