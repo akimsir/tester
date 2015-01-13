@@ -121,6 +121,8 @@ class Test
 
     public $cache = null;
 
+    public $cacheTime = 86400;
+
     protected $domObjectsLocalCache = [];
 
     public function __construct($entities, $logger, $cache)
@@ -141,6 +143,7 @@ class Test
             $url = $v['url'];
 
             if (null !== $this->compareData) {
+                $this->cacheTime   = 1;
                 $isIdentical       = $this->compareWithData($url);
                 $this->compareWith = 'compare with accepted data';
             } else {
@@ -150,6 +153,7 @@ class Test
                     }
 
                     $compareUrl = preg_replace('/http:\/\/[^\/]+/', 'http://' . $this->compareHost, $url);
+
                     $this->testHost = 'krisha.ak.dev';
                 }
 
@@ -229,7 +233,6 @@ class Test
         }
 
         $result    = $this->cache->load($key);
-        $cacheTime = 86400;
 
         if (strpos($url, $this->testHost) !== false) {
             $result = false;;
@@ -237,7 +240,7 @@ class Test
 
         if (false === $result) {
             $result = new Zend_Dom_Query(file_get_contents($url));
-            $this->cache->save($result, $key, [], $cacheTime);
+            $this->cache->save($result, $key, [], $this->cacheTime);
         }
 
         $this->domObjectsLocalCache[$key] = $result;
