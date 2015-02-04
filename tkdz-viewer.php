@@ -121,7 +121,12 @@
                 dataType:'json',
                 success: function (response) {
                     if (typeof (response['data']) != 'undefined') {
-                        resultBlock.html(response['data']);
+                        if (response['error']) {
+                            resultBlock.html('<div style="color:red">' + response['error'] + '</div>');
+                        } else {
+                            resultBlock.html(response['data']);
+                        }
+
                         $('.loading-progress', block).remove();
                         if (nextBlock.length) {
                             sendRequest(nextBlock, nextBlock.next('.url-block'));
