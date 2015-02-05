@@ -25,14 +25,14 @@ $parameters = [
     'charset'  => 'utf8',
 ];
 
+$db = Zend_Db::factory('Mysqli', $parameters);
+
 $out = [
     'data'  => '',
     'error' => ''
 ];
 
 if (isset($_GET['cmd'])) {
-    $db = Zend_Db::factory('Mysqli', $parameters);
-
     switch ($_GET['cmd']) {
         case 'get-search-urls':
             $result = $db->fetchAll('select * from `search_urls` order by id desc');
@@ -75,6 +75,7 @@ $cache = new Zend_Cache_Backend_Memcached(
 try {
     $logger = new Logger();
     $tester = new Test([['url' => $_GET['url']]], $logger, $cache);
+    $tester->setDb($db);
 
     if (isset($_GET['compare-data'])) {
         $tester->compareData = $_GET['compare-data'];
@@ -99,11 +100,15 @@ try {
     echo json_encode($out);
 }
 
-
 return;
 
 class Test
 {
+
+    /**
+     * @var Zend_Db_Adapter_Mysqli
+     */
+    protected $db = null;
 
     protected $logger = null;
 
@@ -127,12 +132,9 @@ class Test
 
     public function __construct($entities, $logger, $cache)
     {
-
-        $this->logger = $logger;
-
+        $this->logger   = $logger;
         $this->entities = $entities;
-
-        $this->cache = $cache;
+        $this->cache    = $cache;
     }
 
     public function doWork()
@@ -147,6 +149,8 @@ class Test
                 $isIdentical       = $this->compareWithData($url);
                 $this->compareWith = 'compare with accepted data';
             } else {
+                $compareUrl = null;
+
                 if (strpos($url, 'krisha') !== false) {
                     if (!$this->compareHost) {
                         $this->compareHost = 'krisha.kz';
@@ -157,12 +161,7 @@ class Test
                     if (isset($matches[1])) {
                         $this->testHost = $matches[1];
                     } else {
-                        $out = [
-                            'data'  => '',
-                            'error' => 'Не определён урл для сравнения'
-                        ];
-
-                        return json_encode($out);
+                        throw new Exception('Не определён урл для сравнения');
                     }
                 }
 
@@ -174,6 +173,10 @@ class Test
                     $compareUrl = preg_replace('/http:\/\/[^\/]+/', 'http://kolesa.kz', $url);
                 }
 
+                if (!$compareUrl) {
+                    throw new Exception('Неподходящий урл для сравнения');
+                }
+
                 $this->compareWith = 'compare with ' . $compareUrl;
                 $this->logger->log('compare with ' . $compareUrl);
                 $this->logger->log('');
@@ -182,11 +185,42 @@ class Test
                 $isIdentical = $this->compare($compareUrl, $url, 'h1') && $isIdentical;
                 $isIdentical = $this->compare($compareUrl, $url, 'link[rel="canonical"]', 'href') && $isIdentical;
                 $isIdentical = $this->compare($compareUrl, $url, 'meta[name="robots"]', 'content') && $isIdentical;
+
+                $this->saveInSetUrl($url);
             }
         }
 
         if ($isIdentical) {
             $this->compareResult = 'identical';
+        }
+    }
+
+    /**
+     * @param null $db
+     */
+    public function setDb($db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     * Сохранение урла в набор
+     *
+     * @param $url
+     * @throws Zend_Db_Adapter_Exception
+     */
+    protected function saveInSetUrl($url)
+    {
+        $validator = new Zend_Validate_Db_NoRecordExists(
+            array(
+                'table' => 'search_urls',
+                'field' => 'url',
+                'adapter' => $this->db
+            )
+        );
+
+        if ($validator->isValid($url)) {
+            $this->db->insert('search_urls', ['url' => $url]);
         }
     }
 
@@ -241,7 +275,7 @@ class Test
             return $this->domObjectsLocalCache[$key];
         }
 
-        $result    = $this->cache->load($key);
+        $result = $this->cache->load($key);
 
         if (strpos($url, $this->testHost) !== false) {
             $result = false;;
@@ -321,9 +355,9 @@ class Logger
         $this->data .= "\n" . $data;
 
         file_put_contents(
-        'tkdz-viewer-log',
-        "\n".date('Y-m-d H:i:s').' ' .$data,
-        FILE_APPEND
+            'tkdz-viewer-log',
+            "\n" . date('Y-m-d H:i:s') . ' ' . $data,
+            FILE_APPEND
         );
     }
 }
