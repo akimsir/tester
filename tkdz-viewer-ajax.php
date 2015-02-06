@@ -219,6 +219,8 @@ class Test
             )
         );
 
+        $url = preg_replace('|http://[^/]+/|', '', $url);
+
         if ($validator->isValid($url)) {
             $this->db->insert('search_urls', ['url' => $url]);
         }
