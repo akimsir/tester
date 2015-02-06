@@ -29,7 +29,7 @@
 <body>
 <h2>Сравнение ТКДЗ продакшина с указанным урлом</h2><br/>
 
-<a href="http://c2n.me/inQ8v5.png">Help!!! </a><br/>
+<a href="http://c2n.me/3bUcjLj.png">Help!!! </a><br/>
 Testing
 sets:<input placeholder="Хост для урлов" class="compare-host-sets"><a href="#" data-cmd="get-search-urls" class="command">search
     urls</a>
