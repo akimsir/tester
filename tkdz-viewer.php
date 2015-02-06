@@ -27,9 +27,9 @@
     </style>
 </head>
 <body>
-<h2>Сравнение ТКДЗ продакшина с указанным урлом</h2><br/>
+<h2>Сравнение ТКДЗ продакшина с указанным урлом</h2>
 
-<a href="http://c2n.me/3bUcjLj.png">Help!!! </a><br/>
+<a style="margin: 0 0 10px 570px;color: green;" href="http://c2n.me/3bUcjLj.png">Help!!! </a><br/>
 Testing
 sets:<input placeholder="Хост для урлов" class="compare-host-sets"><a href="#" data-cmd="get-search-urls" class="command">search
     urls</a>
