@@ -49,7 +49,7 @@ sets:<input placeholder="Хост для урлов" class="compare-host-sets"><
         <textarea class="description" placeholder="Description"></textarea><br/>
         <textarea class="h1" placeholder="h1"></textarea>
     </div>
-    <input type="text" style="width:500px" placeholder="test url"/>
+    <input type="text" style="width:60%" placeholder="test url"/>
 
     <div class="result">
 
@@ -87,7 +87,7 @@ sets:<input placeholder="Хост для урлов" class="compare-host-sets"><
                     if (typeof (response['data']) != 'undefined') {
                         $.each(response['data'], function (i, v) {
                             urlBlock.after('<div class="url-block"><input type="text" value="' + 'http://' + compareHostSets + '/' + v['url'] +
-                                '"style="width:500px" placeholder="test url"/><div style="width: 600px" class="result"></div></div>'
+                                '"style="width:60%" placeholder="test url"/><div style="width: 600px" class="result"></div></div>'
                             );
                         });
                     }
@@ -116,6 +116,12 @@ sets:<input placeholder="Хост для урлов" class="compare-host-sets"><
 
             return false;
         });
+
+        $(".url-block input").keypress(function(event) {
+            if (event.keyCode == 13) {
+                $(".do-check").click();
+            }
+        })
 
         function sendRequest(block, nextBlock)
         {
