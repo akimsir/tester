@@ -126,7 +126,7 @@ class Test
 
     public $cache = null;
 
-    public $cacheTime = 86400;
+    public $cacheTime = 7200;
 
     protected $domObjectsLocalCache = [];
 
@@ -356,10 +356,10 @@ class Logger
     {
         $this->data .= "\n" . $data;
 
-        file_put_contents(
+        /*file_put_contents(
             'tkdz-viewer-log',
             "\n" . date('Y-m-d H:i:s') . ' ' . $data,
             FILE_APPEND
-        );
+        );*/
     }
 }
