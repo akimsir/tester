@@ -1,0 +1,19 @@
+CREATE TABLE `advert_urls` (
+	`id` INT(10) NOT NULL AUTO_INCREMENT,
+	`url` VARCHAR(255) NOT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE INDEX `url` (`url`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=1;
+
+CREATE TABLE `search_urls` (
+	`id` INT(10) NOT NULL AUTO_INCREMENT,
+	`url` VARCHAR(255) NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE INDEX `url` (`url`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=1;
