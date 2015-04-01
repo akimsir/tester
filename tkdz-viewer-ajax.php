@@ -105,6 +105,10 @@ return;
 class Test
 {
 
+    const SEARCH_URLS_TABLE = 'search_urls';
+
+    const ADVERTS_URLS_TABLE = 'advert_urls';
+
     /**
      * @var Zend_Db_Adapter_Mysqli
      */
@@ -211,10 +215,16 @@ class Test
      */
     protected function saveInSetUrl($url)
     {
+
+        $tableName = self::SEARCH_URLS_TABLE;
+        if (strpos($url, 'a/show/')) {
+            $tableName = self::ADVERTS_URLS_TABLE;
+        }
+
         $validator = new Zend_Validate_Db_NoRecordExists(
             array(
-                'table' => 'search_urls',
-                'field' => 'url',
+                'table'   => $tableName,
+                'field'   => 'url',
                 'adapter' => $this->db
             )
         );
@@ -222,7 +232,7 @@ class Test
         $url = preg_replace('|http://[^/]+/|', '', $url);
 
         if ($validator->isValid($url)) {
-            $this->db->insert('search_urls', ['url' => $url]);
+            $this->db->insert($tableName, ['url' => $url]);
         }
     }
 
