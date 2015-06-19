@@ -1,0 +1,76 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: #333333;
+}
+
+a {
+    color: #06c;
+}
+
+input {
+    padding: 3px;
+}
+
+.content {
+    padding: 10px;
+    padding-top: 25px;
+}
+
+.compare-data textarea {
+    width: 800px;
+}
+
+.compare-data {
+    display: none;
+}
+
+.url-block {
+    padding-bottom: 15px;
+}
+
+.url-sets {
+    display: none;
+    border-bottom: 1px #ccc dashed;
+    padding-bottom: 15px;
+    width: 581px;
+}
+
+.help {
+    padding-left: 30px;
+    color: green;
+    background: url("i/help_blue.png");
+    height: 45px;
+    width: 17px;
+    display: inline-block;
+    position: absolute;
+    top: 3px;
+}
+
+.flink {
+    text-decoration: none;
+    border-bottom: 1px dotted #06c;
+}
+
+.flink:hover {
+    border-bottom: 1px dotted #fff;
+}
+
+.gray-block {
+    background: #f5f5f5;
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.test-url {
+    width: 60%;
+    margin-top: 2px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+    font-size: 14px;
+}

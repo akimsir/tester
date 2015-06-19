@@ -1,171 +1,51 @@
-<?php
-/**
- * Created by Akim.
- * Date: 25.06.14
- * Time: 9:59
- */
-?>
 <html>
 <head>
     <script type="application/javascript" src="/js/jquery-1.11.1.min.js"></script>
-    <style>
-        body {
-            font-family: Tahoma, Verdana, Arial, sans-serif;
-        }
-
-        .compare-data textarea {
-            width: 800px;
-        }
-
-        .compare-data {
-            display: none;
-        }
-
-        .url-block {
-            padding-bottom: 15px;
-        }
-    </style>
+    <script type="application/javascript" src="/js/scripts.js"></script>
+    <link href="css.css" media="screen" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<h2>Сравнение ТКДЗ продакшина с указанным урлом</h2>
-
-<a style="margin: 0 0 10px 570px;color: green;" href="http://c2n.me/3bUcjLj.png">Help!!! </a><br/>
-Testing
-sets:<input placeholder="Хост для тестовых урлов" class="compare-host-sets"><a href="#" data-cmd="get-search-urls" class="command">search
-    urls</a>
-<a href="#" data-cmd="get-advert-urls" class="command">advert urls</a><br/><br/>
-
-<input type="button" value="Сравнить" class="do-check"/>
-с
-<input placeholder="Хост для сравнения" class="compare-host">
-<small>по умолчанию krisha.kz</small>
-<br/><br/>
-
-<div class="url-block">
-    <a class="compare-with" style="font-size: 11px;margin-bottom: 5px;" href="#">Compare with text</a><br/>
-
-    <div class="compare-data">
-        <textarea class="title" placeholder="Title"></textarea><br/>
-        <textarea class="description" placeholder="Description"></textarea><br/>
-        <textarea class="h1" placeholder="h1"></textarea>
-    </div>
-    <input type="text" style="width:60%" placeholder="test url"/>
-
-    <div class="result">
-
-    </div>
+<div class="gray-block">
+    <h2 style="display: inline">Сравнение ТКДЗ продакшина с указанным тестовым сайтом</h2>
+    <a class="help" title="Помощь" href="http://c2n.me/3bUcjLj.png"></a>
 </div>
-<br/>
-<a href="#" class="add-url">add one url</a>
 
+<div class="content">
+    <a class="flink url-sets-block-open" href="#">Использовать раннее сравниваемые урлы</a>
 
-<script>
-    $(document).ready(function () {
+    <div class="url-sets">
+        <br/>
+        <input placeholder="Хост для тестовых урлов" class="compare-host-sets">
+        <a href="#" data-cmd="get-search-urls" title="Набор сравниваемых ссылок при поиске обьявлений" class="command">search
+            urls</a>
+        <a href="#" data-cmd="get-advert-urls" title="Набор сравниваемых ссылок страниц обьявлений" class="command">advert
+            urls</a>
+    </div>
 
-        $(".compare-with").click(function () {
-            $(this).closest('.url-block').find('.compare-data').toggle();
+    <br/><br/>
+    <input type="button" value="Начать сравнение" class="do-check"/>
+    с
+    <input placeholder="Хост для сравнения" class="compare-host">
+    <small>по умолчанию krisha.kz</small>
+    <br/><br/>
 
-            return false;
-        });
+    <div class="url-block">
+        <a class="compare-with flink" style="font-size: 11px;margin-bottom: 5px;" href="#">Задать текст</a>
+        <br/>
 
-        $(".command").click(function () {
+        <div class="compare-data">
+            <textarea class="title" placeholder="Title"></textarea><br/>
+            <textarea class="description" placeholder="Description"></textarea><br/>
+            <textarea class="h1" placeholder="h1"></textarea>
+        </div>
+        <input class="test-url" type="text" placeholder="Введите урл для сравнения"/>
 
-            var
-                urlBlock = $(".url-block").last(),
-                $this    = $(this),
-                compareHostSets = $(".compare-host-sets").val().trim();
+        <div class="result">
 
-            if (!compareHostSets) {
-                compareHostSets = 'krisha.ak.dev';
-            }
-
-            $.ajax({
-                url     : 'tkdz-viewer-ajax.php',
-                data    : {'cmd': $this.data('cmd')},
-                dataType: 'json',
-                success : function (response) {
-                    if (typeof (response['data']) != 'undefined') {
-                        $.each(response['data'], function (i, v) {
-                            urlBlock.after('<div class="url-block"><input type="text" value="' + 'http://' + compareHostSets + '/' + v['url'] +
-                                '"style="width:60%" placeholder="test url"/><div style="width: 600px" class="result"></div></div>'
-                            );
-                        });
-                    } else {
-                        alert("response['data'] is undefined");
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert("Неправильный формат ответа");
-                    console.debug(jqXHR, textStatus, errorThrown);
-                }
-            });
-
-            return false;
-        });
-
-        $(".add-url").click(function () {
-            var urlBlock = $(".url-block").last();
-            var newUrlBlock = $('<div class="url-block">' + urlBlock.html() + '</div>');
-            urlBlock.after(newUrlBlock);
-            $(".compare-with", newUrlBlock).click(function () {
-                $(this).closest('.url-block').find('.compare-data').toggle();
-
-                return false;
-            });
-
-            return false;
-        });
-
-        $(".do-check").click(function () {
-            var firstBlock = $(".url-block:first");
-            sendRequest(firstBlock, firstBlock.next('.url-block:first'));
-
-            return false;
-        });
-
-        $(".url-block input").keypress(function(event) {
-            if (event.keyCode == 13) {
-                $(".do-check").click();
-            }
-        })
-
-        function sendRequest(block, nextBlock)
-        {
-            var input = $('input', block);
-            var resultBlock = $('.result', block);
-            var compareData = {};
-
-            if ($('.compare-data', block).is(':visible')) {
-                $('.compare-data textarea', block).each(function () {
-                    compareData[$(this).attr('class')] = $(this).val();
-                });
-            }
-
-            block.prepend('<img src="/i/loading.gif" class="loading-progress" />');
-
-            $.ajax({
-                url     : 'tkdz-viewer-ajax.php',
-                data    : {'url': input.val(), 'compare-data': compareData, 'compare-host': $('.compare-host').val()},
-                dataType: 'json',
-                success : function (response) {
-                    if (typeof (response['data']) != 'undefined') {
-                        if (response['error']) {
-                            resultBlock.html('<div style="color:red">' + response['error'] + '</div>');
-                        } else {
-                            resultBlock.html(response['data']);
-                        }
-
-                        $('.loading-progress', block).remove();
-                        if (nextBlock.length) {
-                            sendRequest(nextBlock, nextBlock.next('.url-block'));
-                        }
-                    }
-                }
-            });
-        }
-    })
-
-
-</script>
+        </div>
+    </div>
+    <br/>
+    <a href="#" title="Добавить ещё одно поле ввода для урла" class="flink add-url">Добавить поле</a>
+</div>
 </body>
 </html>
