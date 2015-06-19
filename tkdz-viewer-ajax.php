@@ -48,6 +48,10 @@ try {
         $comparator->compareHost = $_GET['compare-host'];
     }
 
+    if (isset($_GET['canonical-hosts'])) {
+        $comparator->canonicalHosts = $_GET['canonical-hosts'];
+    }
+
     $comparator->doWork();
 
     if (!empty($comparator->serviceMessages)) {

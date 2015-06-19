@@ -32,7 +32,7 @@ $(document).ready(function () {
                     $.each(response['data'], function (i, v) {
                         urlBlock.after(
                             '<div class="url-block"><input type="text" class="test-url" value="' +
-                             compareHostSets + '/' + v['url'] + '" placeholder="test url"/>' +
+                            compareHostSets + '/' + v['url'] + '" placeholder="test url"/>' +
                             '<div style="width: 600px" class="result"></div></div>'
                         );
                     });
@@ -95,15 +95,11 @@ $(document).ready(function () {
 
 function canonicalChange($expected, $current) {
     onChange($current, function () {
-        if ($expected.val()) {
-            setCanonicalText($current.val(), $expected.val());
-        }
+        setCanonicalText($current.val(), $expected.val());
     });
 
     onChange($expected, function () {
-        if ($current.val()) {
-            setCanonicalText($current.val(), $expected.val());
-        }
+        setCanonicalText($current.val(), $expected.val());
     });
 }
 
@@ -134,7 +130,15 @@ function sendRequest(block, nextBlock) {
 
     $.ajax({
         url:      'tkdz-viewer-ajax.php',
-        data:     {'url': input.val(), 'compare-data': compareData, 'compare-host': $('.compare-host').val()},
+        data:     {
+            'url':            input.val(),
+            'compare-data':   compareData,
+            'compare-host':   $('.compare-host').val(),
+            'canonical-hosts': {
+                'current':  processHttp($('.current-canonical').val()),
+                'expected': processHttp($('.expected-canonical').val())
+            }
+        },
         dataType: 'json',
         success:  function (response) {
             if (typeof (response['data']) != 'undefined') {
@@ -154,5 +158,16 @@ function sendRequest(block, nextBlock) {
 }
 
 function trimSlashes(string) {
-    return string.replace(/^\/+|\/+$/gm,'');
+    return string.replace(/^\/+|\/+$/gm, '');
+}
+
+function processHttp(url)
+{
+    url = url.trim();
+
+    if (url && !/http/.test(url)) {
+        url = 'http://' + url
+    }
+
+    return url;
 }

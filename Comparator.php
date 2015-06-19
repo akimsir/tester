@@ -33,6 +33,8 @@ class Comparator
 
     public $serviceMessages = [];
 
+    public $canonicalHosts = [];
+
     public function __construct($entities, $logger)
     {
         $this->logger   = $logger;
@@ -213,7 +215,27 @@ class Comparator
             $return = $this->getAttrValue($dom, $query, $attr);
         }
 
+        $return = $this->afterParseData($url, $return, $query);
+
         return $return;
+    }
+
+    /**
+     * @param string $data
+     */
+    protected function afterParseData($url, $data, $query)
+    {
+        if ('link[rel="canonical"]' === $query && !empty($this->canonicalHosts)) {
+            if (strpos($url, $this->testHost) !== false && !empty($this->canonicalHosts['current'])) {
+                $data = str_replace($this->canonicalHosts['current'], '', $data);
+            }
+
+            if (strpos($url, $this->compareHost) !== false && !empty($this->canonicalHosts['expected'])) {
+                $data = str_replace($this->canonicalHosts['expected'], '', $data);
+            }
+        }
+
+        return $data;
     }
 
     public function getDom($url)
@@ -279,9 +301,6 @@ class Comparator
 
         if ($results && $results->current()) {
             $attrValue = $results->current()->getAttribute($attrName);
-            if (0 === strcasecmp($attrName, 'href')) {
-                $attrValue = str_replace([$this->compareHost, $this->testHost], ['', ''], $attrValue);
-            }
 
             return $attrValue;
         }

@@ -14,6 +14,7 @@ a {
 
 input {
     padding: 3px;
+    width:228px;
 }
 
 .content {
@@ -98,11 +99,6 @@ input {
 .current-plan span {
     font-weight: bold;
 }
-
-
-
-
-
 
 .super-button {
     list-style: none;
