@@ -93,13 +93,18 @@ class Comparator
             } else {
                 $compareUrl = null;
 
-                if (strpos($url, 'krisha') !== false) {
+                if (strpos($url, 'krisha') !== false || strpos($url, 'm-kr') !== false) {
                     if (!$this->compareHost) {
-                        $this->compareHost = 'krisha.kz';
+                        $this->compareHost = 'http://krisha.kz';
                     }
 
-                    $compareUrl = preg_replace('/http:\/\/[^\/]+/', 'http://' . $this->compareHost, $url);
-                    preg_match('/http:\/\/([^\/]+)/', $url, $matches);
+                    if (false !== strpos('http', $this->compareHost)) {
+                        $this->compareHost = 'http://' . $this->compareHost;
+                    }
+
+                    $compareUrl = preg_replace('/.+\/\/[^\/]+/', $this->compareHost, $url);
+                    preg_match('/.+\/\/([^\/]+)/', $url, $matches);
+
                     if (isset($matches[1])) {
                         $this->testHost = $matches[1];
                     } else {
@@ -240,8 +245,8 @@ class Comparator
         $isIdentical = false;
         if (strcmp($data1, $data2) !== 0) {
             $this->logger->log($query . ':');
-            $this->logger->log('test: ' . $data2);
-            $this->logger->log('prod: ' . $data1);
+            $this->logger->log('Текущий  : ' . $data2);
+            $this->logger->log('Ожидаемый: ' . $data1);
             $this->logger->log('');
         } else {
             $this->logger->log($query . ':');

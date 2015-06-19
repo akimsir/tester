@@ -10,7 +10,7 @@
     <a class="help" title="Помощь" href="http://c2n.me/3bUcjLj.png"></a>
 </div>
 
-<div class="content">
+<div class="gray-block">
     <a class="flink url-sets-block-open" href="#">Использовать раннее сравниваемые урлы</a>
 
     <div class="url-sets">
@@ -21,13 +21,32 @@
         <a href="#" data-cmd="get-advert-urls" title="Набор сравниваемых ссылок страниц обьявлений" class="command">advert
             urls</a>
     </div>
+    <br/><br/>
+    <a class="flink settings-open" href="#">Настройки</a>
 
-    <br/><br/>
-    <input type="button" value="Начать сравнение" class="do-check"/>
-    с
-    <input placeholder="Хост для сравнения" class="compare-host">
-    <small>по умолчанию krisha.kz</small>
-    <br/><br/>
+    <div class="settings">
+        <br/>
+        <input placeholder="Текущий хост каноникала" class="current-canonical">
+        <input placeholder="Ожидаемый хост каноникала" class="expected-canonical"><br/><br/>
+
+        <input placeholder="Хост для сравнения" class="compare-host">
+           <small>по умолчанию krisha.kz</small>
+    </div>
+</div>
+
+<div class="content">
+    <div class="super-button">
+        <a href="#" class="round green do-check">
+            Start<span class="round">Начать сравнивать урлы</span>
+        </a>
+    </div>
+
+    <div class="current-plan">
+        Введённые урлы будут сравниваться с <span class="current-compare-host">krisha.kz</span>
+        <div class="canonical-settings">Хосты каноникала при сравнении будут отличаться</div>
+    </div>
+
+    <br style="clear: both"/> <br/><br/>
 
     <div class="url-block">
         <a class="compare-with flink" style="font-size: 11px;margin-bottom: 5px;" href="#">Задать текст</a>
