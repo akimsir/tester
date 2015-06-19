@@ -31,7 +31,7 @@
 
 <a style="margin: 0 0 10px 570px;color: green;" href="http://c2n.me/3bUcjLj.png">Help!!! </a><br/>
 Testing
-sets:<input placeholder="Хост для урлов" class="compare-host-sets"><a href="#" data-cmd="get-search-urls" class="command">search
+sets:<input placeholder="Хост для тестовых урлов" class="compare-host-sets"><a href="#" data-cmd="get-search-urls" class="command">search
     urls</a>
 <a href="#" data-cmd="get-advert-urls" class="command">advert urls</a><br/><br/>
 
