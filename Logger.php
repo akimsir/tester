@@ -7,10 +7,10 @@ class Logger
     {
         $this->data .= "\n" . $data;
 
-        /*file_put_contents(
-            'tkdz-viewer-log',
+        file_put_contents(
+            'logs/compare.log',
             "\n" . date('Y-m-d H:i:s') . ' ' . $data,
             FILE_APPEND
-        );*/
+        );
     }
 }

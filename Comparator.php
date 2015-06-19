@@ -9,7 +9,7 @@ class Comparator
     /**
      * @var Zend_Db_Adapter_Mysqli
      */
-    protected $db = null;
+    public $db = null;
 
     protected $logger = null;
 
@@ -63,34 +63,6 @@ class Comparator
         ];
 
         $db = Zend_Db::factory('Mysqli', $parameters);
-
-        if (isset($_GET['cmd'])) {
-            switch ($_GET['cmd']) {
-                case 'get-search-urls':
-                    $result = $db->fetchAll('select * from `search_urls` order by id desc');
-
-                    $out['data'] = $result;
-                    echo json_encode($out);
-
-                    break;
-                case 'get-advert-urls':
-                    $result = $db->fetchAll('select * from `advert_urls` order by id desc');
-
-                    $out['data'] = $result;
-                    echo json_encode($out);
-
-                    break;
-            }
-
-            return;
-        }
-
-        if (!isset($_GET['url']) || !$_GET['url']) {
-            $out['error'] = 'нужен урл';
-            echo json_encode($out);
-
-            return;
-        }
 
         $this->setDb($db);
 
@@ -149,7 +121,7 @@ class Comparator
                 $isIdentical = $this->compare($compareUrl, $url, 'h1') && $isIdentical;
                 $isIdentical = $this->compare($compareUrl, $url, 'link[rel="canonical"]', 'href') && $isIdentical;
                 $isIdentical = $this->compare($compareUrl, $url, 'meta[name="robots"]', 'content') && $isIdentical;
-
+                $this->logger->log(PHP_EOL);
                 $this->saveInSetUrl($url);
             }
         }
@@ -270,16 +242,11 @@ class Comparator
             $this->logger->log($query . ':');
             $this->logger->log('test: ' . $data2);
             $this->logger->log('prod: ' . $data1);
-
-            /*  $this->logger->log('xdiff_string_bdiff:' . xdiff_string_diff (
-                  $prod,
-                  $test
-              ));*/
             $this->logger->log('');
-
         } else {
             $this->logger->log($query . ':');
-            $this->logger->log('identical' . "\n");
+            $this->logger->log('identical');
+            $this->logger->log('');
             $isIdentical = true;
         }
 

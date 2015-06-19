@@ -90,7 +90,13 @@ sets:<input placeholder="Хост для тестовых урлов" class="com
                                 '"style="width:60%" placeholder="test url"/><div style="width: 600px" class="result"></div></div>'
                             );
                         });
+                    } else {
+                        alert("response['data'] is undefined");
                     }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Неправильный формат ответа");
+                    console.debug(jqXHR, textStatus, errorThrown);
                 }
             });
 
