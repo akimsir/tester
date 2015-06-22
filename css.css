@@ -110,6 +110,10 @@ input {
     float: left
 }
 
+.super-button.stop {
+    display: none;
+}
+
 .super-button .round {
     -moz-box-sizing: border-box;
     -o-box-sizing: border-box;

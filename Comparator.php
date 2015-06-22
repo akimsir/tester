@@ -168,7 +168,7 @@ class Comparator
             ]
         );
 
-        $url = preg_replace('|http://[^/]+/|', '', $url);
+        $url = preg_replace('/.+\/\/[^\/]+\//', '', $url);
 
         if ($validator->isValid($url)) {
             $this->db->insert($tableName, ['url' => $url]);

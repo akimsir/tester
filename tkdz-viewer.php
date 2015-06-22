@@ -30,16 +30,22 @@
         <input placeholder="Ожидаемый хост каноникала" class="expected-canonical"><br/><br/>
 
         <input placeholder="Хост для сравнения" class="compare-host">
-           <small>по умолчанию krisha.kz</small>
+        <small>по умолчанию krisha.kz</small>
     </div>
 </div>
 
 <div class="content">
-    <div class="super-button">
+    <div class="super-button start">
         <a href="#" class="round green do-check">
             Start<span class="round">Начать сравнивать урлы</span>
         </a>
     </div>
+    <div class="super-button stop">
+        <a href="#" class="round red do-stop">
+            Stop<span class="round">Остановить это безобразие</span>
+        </a>
+    </div>
+
 
     <div class="current-plan">
         Введённые урлы будут сравниваться с <span class="current-compare-host">krisha.kz</span>

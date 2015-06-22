@@ -1,5 +1,6 @@
-$(document).ready(function () {
+var doRequest = true;
 
+$(document).ready(function () {
     $(".compare-with").click(function () {
         $(this).closest('.url-block').find('.compare-data').toggle();
 
@@ -64,7 +65,18 @@ $(document).ready(function () {
 
     $(".do-check").click(function () {
         var firstBlock = $(".url-block:first");
+        doRequest = true;
         sendRequest(firstBlock, firstBlock.next('.url-block:first'));
+
+        toggleSuperButtons()
+
+        return false;
+    });
+
+    $(".do-stop").click(function () {
+
+        doRequest = false;
+        toggleSuperButtons()
 
         return false;
     });
@@ -116,9 +128,13 @@ function onChange($element, cbFunction) {
 }
 
 function sendRequest(block, nextBlock) {
-    var input = $('input', block);
-    var resultBlock = $('.result', block);
-    var compareData = {};
+    var input = $('input', block),
+        resultBlock = $('.result', block),
+        compareData = {};
+
+    if (!doRequest) {
+        return false;
+    }
 
     if ($('.compare-data', block).is(':visible')) {
         $('.compare-data textarea', block).each(function () {
@@ -151,6 +167,8 @@ function sendRequest(block, nextBlock) {
                 $('.loading-progress', block).remove();
                 if (nextBlock.length) {
                     sendRequest(nextBlock, nextBlock.next('.url-block'));
+                } else {
+                    toggleSuperButtons();
                 }
             }
         }
@@ -170,4 +188,19 @@ function processHttp(url)
     }
 
     return url;
+}
+
+function toggleSuperButtons()
+{
+    var
+        $start = $(".super-button.start"),
+        $stop  = $(".super-button.stop");
+
+    if ($start.is(":visible")) {
+        $start.hide();
+        $stop.show();
+    } else {
+        $start.show();
+        $stop.hide();
+    }
 }
