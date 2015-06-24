@@ -267,8 +267,8 @@ class Comparator
         $isIdentical = false;
         if (strcmp($data1, $data2) !== 0) {
             $this->logger->log($query . ':');
-            $this->logger->log('Текущий  : ' . $data2);
-            $this->logger->log('Ожидаемый: ' . $data1);
+            $this->logger->log('Test: ' . $data2);
+            $this->logger->log('Prod: ' . $data1);
             $this->logger->log('');
         } else {
             $this->logger->log($query . ':');
