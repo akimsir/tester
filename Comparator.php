@@ -121,10 +121,12 @@ class Comparator
                     $compareUrl = preg_replace('/.+\/\/[^\/]+/', $this->compareHost, $url);
                     preg_match('/.+\/\/([^\/]+)/', $url, $matches);
 
-                    if (strpos($compareUrl, '?') === false) {
-                        $compareUrl = $compareUrl . '?' . $compareParameters;
-                    } else {
-                        $compareUrl = $compareUrl . '&' . $compareParameters;
+                    if ($compareParameters) {
+                        if (strpos($compareUrl, '?') === false) {
+                            $compareUrl = $compareUrl . '?' . $compareParameters;
+                        } else {
+                            $compareUrl = $compareUrl . '&' . $compareParameters;
+                        }
                     }
 
                     if (isset($matches[1])) {
@@ -230,9 +232,9 @@ class Comparator
         $dom = $this->getDom($url);
 
         if ($query == 'title' || $query == 'h1') {
-            $return = $this->getTextValue($dom, $query);
+            $return = $this->getTextValue($dom, $query, $url);
         } else {
-            $return = $this->getAttrValue($dom, $query, $attr);
+            $return = $this->getAttrValue($dom, $query, $attr, $url);
         }
 
         $return = $this->afterParseData($url, $return, $query);
@@ -300,33 +302,35 @@ class Comparator
         return $isIdentical;
     }
 
-    public function getTextValue($dom, $query)
+    public function getTextValue($dom, $query, $url)
     {
         $results = $dom->query($query);
 
         if (count($results) > 1) {
-            $this->serviceMessages[] = 'По запросу ' . $query . ' найдено несколько результатов';
+            $this->serviceMessages[] = $url . ': по запросу ' . $query . ' найдено несколько результатов';
         }
 
         if (count($results) == 0) {
-            $this->serviceMessages[] = $this->compareHost . ' По запросу ' . $query . ' не найдено результатов';
+            $this->serviceMessages[] = $url . ': по запросу ' . $query . ' не найдено результатов';
         } else {
             return $results->current()->textContent;
         }
     }
 
-    public function getAttrValue($dom, $query, $attrName)
+    public function getAttrValue($dom, $query, $attrName, $url)
     {
         $results = $dom->query($query);
 
         if (count($results) > 1) {
-            $this->serviceMessages[] = 'По запросу ' . $query . ' - ' . $attrName . ' найдено несколько результатов';
+            $this->serviceMessages[] = $url . ' по запросу ' . $query . ' - ' . $attrName . ' найдено несколько результатов';
         }
 
         if ($results && $results->current()) {
             $attrValue = $results->current()->getAttribute($attrName);
 
             return $attrValue;
+        } else {
+            $this->serviceMessages[] = $url . ': по запросу ' . $query . ' атрибут ' . $attrName . ' не найдено результатов';
         }
 
         return null;
