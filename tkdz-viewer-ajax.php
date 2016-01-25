@@ -8,6 +8,10 @@ try {
         'error' => ''
     ];
 
+    if (!isset($_GET['url'])) {
+        $_GET['url'] = '';
+    }
+
     $logger     = new Logger();
     $comparator = new Comparator([['url' => $_GET['url']]], $logger);
     $comparator->init();
