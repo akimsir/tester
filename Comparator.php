@@ -104,8 +104,28 @@ class Comparator
                         $this->compareHost = 'http://' . $this->compareHost;
                     }
 
+                    $compareParameters = explode('?', $this->compareHost);
+
+                    if (isset($compareParameters[0])) {
+                        $this->compareHost = $compareParameters[0];
+                    } else {
+                        throw new \Exception('Нулевой всегда будет');
+                    }
+
+                    if (isset($compareParameters[1])) {
+                        $compareParameters = $compareParameters[1];
+                    } else {
+                        $compareParameters = null;
+                    }
+
                     $compareUrl = preg_replace('/.+\/\/[^\/]+/', $this->compareHost, $url);
                     preg_match('/.+\/\/([^\/]+)/', $url, $matches);
+
+                    if (strpos($compareUrl, '?') === false) {
+                        $compareUrl = $compareUrl . '?' . $compareParameters;
+                    } else {
+                        $compareUrl = $compareUrl . '&' . $compareParameters;
+                    }
 
                     if (isset($matches[1])) {
                         $this->testHost = $matches[1];
@@ -288,7 +308,11 @@ class Comparator
             $this->serviceMessages[] = 'По запросу ' . $query . ' найдено несколько результатов';
         }
 
-        return $results->current()->textContent;
+        if (count($results) == 0) {
+            $this->serviceMessages[] = $this->compareHost . ' По запросу ' . $query . ' не найдено результатов';
+        } else {
+            return $results->current()->textContent;
+        }
     }
 
     public function getAttrValue($dom, $query, $attrName)
@@ -307,4 +331,17 @@ class Comparator
 
         return null;
     }
+
+  /*  protected function saveParsedData($data)
+    {
+        $insertedData = [
+            'host' => $this->compareHost
+        ]
+
+        $sql = "INSERT INTO "
+             . $this->db->quoteIdentifier('data', true)
+             . ' (' . implode(', ', $cols) . ') '
+             . 'VALUES (' . implode(', ', $vals) . ')';
+        $this->db->($tableName, ['url' => $url]);
+    }*/
 }
