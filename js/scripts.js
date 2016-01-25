@@ -10,7 +10,7 @@ $(document).ready(function () {
     $(".command").click(function () {
         var
             urlBlock = $(".url-block").last(),
-            $this = $(this),
+            $this    = $(this),
             compareHostSets = $(".compare-host-sets").val().trim();
 
         if (!compareHostSets) {
@@ -51,7 +51,7 @@ $(document).ready(function () {
     });
 
     $(".add-url").click(function () {
-        var urlBlock = $(".url-block").last();
+        var urlBlock    = $(".url-block").last();
         var newUrlBlock = $('<div class="url-block">' + urlBlock.html() + '</div>');
         urlBlock.after(newUrlBlock);
         $(".compare-with", newUrlBlock).click(function () {
@@ -65,10 +65,10 @@ $(document).ready(function () {
 
     $(".do-check").click(function () {
         var firstBlock = $(".url-block:first");
-        doRequest = true;
+        doRequest      = true;
         sendRequest(firstBlock, firstBlock.next('.url-block:first'));
 
-        toggleSuperButtons()
+        toggleSuperButtons();
 
         return false;
     });
@@ -76,7 +76,7 @@ $(document).ready(function () {
     $(".do-stop").click(function () {
 
         doRequest = false;
-        toggleSuperButtons()
+        toggleSuperButtons();
 
         return false;
     });
@@ -128,7 +128,7 @@ function onChange($element, cbFunction) {
 }
 
 function sendRequest(block, nextBlock) {
-    var input = $('input', block),
+    var input       = $('input', block),
         resultBlock = $('.result', block),
         compareData = {};
 
@@ -147,9 +147,9 @@ function sendRequest(block, nextBlock) {
     $.ajax({
         url:      'tkdz-viewer-ajax.php',
         data:     {
-            'url':            input.val(),
-            'compare-data':   compareData,
-            'compare-host':   $('.compare-host').val(),
+            'url':             input.val(),
+            'compare-data':    compareData,
+            'compare-host':    $('.compare-host').val(),
             'canonical-hosts': {
                 'current':  processHttp($('.current-canonical').val()),
                 'expected': processHttp($('.expected-canonical').val())
@@ -171,6 +171,18 @@ function sendRequest(block, nextBlock) {
                     toggleSuperButtons();
                 }
             }
+        },
+        error:    function (resp) {
+            if (typeof (resp['responseText']) != 'undefined') {
+                resultBlock.html('<div style="color:red">' + resp.responseText + '</div>');
+
+                $('.loading-progress', block).remove();
+                if (nextBlock.length) {
+                    sendRequest(nextBlock, nextBlock.next('.url-block'));
+                } else {
+                    toggleSuperButtons();
+                }
+            }
         }
     });
 }
@@ -179,8 +191,7 @@ function trimSlashes(string) {
     return string.replace(/^\/+|\/+$/gm, '');
 }
 
-function processHttp(url)
-{
+function processHttp(url) {
     url = url.trim();
 
     if (url && !/http/.test(url)) {
@@ -190,8 +201,7 @@ function processHttp(url)
     return url;
 }
 
-function toggleSuperButtons()
-{
+function toggleSuperButtons() {
     var
         $start = $(".super-button.start"),
         $stop  = $(".super-button.stop");
