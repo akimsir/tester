@@ -329,8 +329,6 @@ class Comparator
             $attrValue = $results->current()->getAttribute($attrName);
 
             return $attrValue;
-        } else {
-            $this->serviceMessages[] = $url . ': по запросу ' . $query . ' атрибут ' . $attrName . ' не найдено результатов';
         }
 
         return null;
